@@ -277,14 +277,14 @@ table.mini td.src{color:var(--meta);font-size:13px;text-align:left}
 
 <section class="card" id="rapporto">
   <h2>Rapporto future ÷ Brent</h2>
-  <p class="lead">Future gasoil in €/t diviso Brent in $/barile: fino a ottobre 2026 dati Bloomberg giornalieri, poi i valori settimanali inseriti qui sopra divisi per il Brent EIA dello stesso giorno.</p>
+  <p class="lead">Future gasoil in €/t diviso Brent in $/barile: fino a ottobre 2026 dati Bloomberg giornalieri, poi i valori settimanali inseriti qui sopra divisi per il Brent dello stesso giorno.</p>
   <div class="chart" id="ch-rap"></div>
   <p class="note" id="rap-note"></p>
 </section>
 </div>
 
 <footer>
-  <p><b>Fonti.</b> Round, rapporti e parametri: salvati online e condivisi tra tutti gli utenti (budget e fabbisogno da <i>ANALISI HEDGING bdg 2027 V2.xlsx</i>). Indice fornitori: <a href="https://energy.ec.europa.eu/data-and-analysis/weekly-oil-bulletin_en" target="_blank" rel="noopener">EU Weekly Oil Bulletin</a>, media ponderata EU-27 del diesel con tasse. Brent: EIA Europe Brent spot via <a href="https://fred.stlouisfed.org/series/DCOILBRENTEU" target="_blank" rel="noopener">FRED</a>. Cambio: BCE via Frankfurter. Future gasoil: export Bloomberg QSX6 fino al 12/10/2026, poi inserimento manuale.</p>
+  <p><b>Fonti.</b> Round, rapporti e parametri: salvati online e condivisi tra tutti gli utenti (budget e fabbisogno da <i>ANALISI HEDGING bdg 2027 V2.xlsx</i>). Indice fornitori: <a href="https://energy.ec.europa.eu/data-and-analysis/weekly-oil-bulletin_en" target="_blank" rel="noopener">EU Weekly Oil Bulletin</a>, media ponderata EU-27 del diesel con tasse. Brent: EIA Europe Brent spot via <a href="https://fred.stlouisfed.org/series/DCOILBRENTEU" target="_blank" rel="noopener">FRED</a> o, se non risponde, future ICE Brent prima scadenza (Yahoo Finance). Cambio: BCE via Frankfurter. Future gasoil: export Bloomberg QSX6 fino al 12/10/2026, poi inserimento manuale.</p>
   <p id="m-status"></p>
   <div class="upd"><button class="btn" type="button" id="m-update">Aggiorna ora</button></div>
 </footer>
@@ -688,7 +688,7 @@ function drawIndicators(){
     series:g.map(x=>[x[0],x[1]]), when:L=>'Valore del '+dlong(L[0])+' · '+(gl[2]||''), how:'Va inserito a mano ogni settimana (qui sotto): non esiste una fonte gratuita ufficiale.',
     links:[['ICE Low Sulphur Gasoil, prezzo attuale (TradingView)','https://www.tradingview.com/symbols/ICEEUR-ULS1!/'],['Prezzi per scadenza (TradingView)','https://www.tradingview.com/symbols/ICEEUR-ULS1!/contracts/'],['Contratto ICE ULSD 10ppm CIF Med, scheda','https://www.ice.com/products/6753556/ULSD-10ppm-CIF-Med-Cargoes-Future']]}));
   if(m.brent&&m.brent.length){
-    c.appendChild(card({title:'Brent',what:'Greggio Brent Europe spot (EIA)',unit:'$/barile',dec:2,auto:true,
+    c.appendChild(card({title:'Brent',what:(m.status&&m.status.brent&&m.status.brent.source)||'Brent',unit:'$/barile',dec:2,auto:true,
       series:m.brent, when:L=>'Valore del '+dlong(L[0]), how:'Si aggiorna da solo: '+stTxt(m.status&&m.status.brent)+'. La fonte pubblica i dati con qualche giorno di ritardo.',
       links:[['Brent, prezzo attuale (TradingView)','https://www.tradingview.com/symbols/ICEEUR-BRN1!/'],['Curva Brent per scadenza (TradingView)','https://www.tradingview.com/symbols/ICEEUR-BRN1!/contracts/'],['Serie ufficiale EIA (FRED)','https://fred.stlouisfed.org/series/DCOILBRENTEU']]}));
   } else c.appendChild(el('div',{class:'ind'},[el('h3',{text:'Brent'}),el('p',{class:'what',text:'Dato non ancora scaricato: premi "Aggiorna ora" in fondo alla pagina.'})]));
@@ -711,7 +711,7 @@ function initCalc(){
   if(m.fx&&!$('c-fx').value) $('c-fx').value=num(m.fx.usd,4);
   if(m.brent&&m.brent.length&&!$('c-brent').value) $('c-brent').value=num(m.brent[m.brent.length-1][1],2);
   $('c-date').value=today();
-  $('c-note').textContent=(m.fx?'Cambio BCE del '+dlong(m.fx.d)+' e ':'')+(m.brent&&m.brent.length?'Brent EIA del '+dlong(m.brent[m.brent.length-1][0])+' già inseriti: correggili se hai valori più recenti. ':'')+'Il future pubblico è il Gasoil ICE in dollari; la banca quota in euro il ULSD 10ppm CIF Med.';
+  $('c-note').textContent=(m.fx?'Cambio BCE del '+dlong(m.fx.d)+' e ':'')+(m.brent&&m.brent.length?'Brent del '+dlong(m.brent[m.brent.length-1][0])+' già inseriti: correggili se hai valori più recenti. ':'')+'Il future pubblico è il Gasoil ICE in dollari; la banca quota in euro il ULSD 10ppm CIF Med.';
   ['c-fut','c-fx','c-brent'].forEach(id=>$(id).addEventListener('input',calc));
   $('c-save').addEventListener('click',saveGasoil);
   $('g-list').addEventListener('click',async e=>{ const a=e.target.closest('button'); if(!a||!a.dataset.gdel) return;
@@ -761,7 +761,7 @@ function renderPompa(){
 function renderRapporto(){
   const m=S.market, A=(m.ratioHist||[]).map(x=>[x[0],x[1],x[2],'Bloomberg']);
   const lastH=A.length?A[A.length-1][0]:'';
-  m.gasoil.filter(x=>x[0]>lastH&&!/Bloomberg/.test(x[2]||'')).forEach(x=>{ const b=near(m.brent||[],x[0],6); if(b) A.push([x[0],x[1],b[1],'inserito + Brent EIA']); });
+  m.gasoil.filter(x=>x[0]>lastH&&!/Bloomberg/.test(x[2]||'')).forEach(x=>{ const b=near(m.brent||[],x[0],6); if(b) A.push([x[0],x[1],b[1],'inserito + Brent']); });
   if(!A.length) return;
   const r=A.map(x=>x[1]/x[2]), n=A.length, w=r.slice(Math.max(0,n-30)), mean=a=>a.reduce((s,v)=>s+v,0)/a.length;
   $('rap-note').textContent='Ultimo dato ('+dlong(A[n-1][0])+'): '+num(r[n-1],2)+'. Media degli ultimi '+w.length+' valori: '+num(mean(w),2)+', tra '+num(Math.min.apply(null,w),1)+' e '+num(Math.max.apply(null,w),1)+'. Rapporti di riserva in uso: '+S.state.ratios.map(fmtR).join(' / ')+'.';
