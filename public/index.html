@@ -1,0 +1,850 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>Hedging fuel 2027 FTL</title>
+<style>
+
+:root{
+  color-scheme:light;
+  --red:#C8102E; --ink:#000000; --charcoal:#545859; --meta:#78797B; --hair:#E2E2E2; --surface:#FFFFFF;
+  --tint:rgba(84,88,89,.06);
+  --display:Arial,Helvetica,"Liberation Sans",sans-serif;
+  --body:Calibri,Carlito,"Segoe UI",sans-serif;
+  /* alias usati dai grafici */
+  --s1:#000000; --s2:#C8102E; --grid:#E2E2E2; --axis:#78797B; --ink2:#545859; --muted:#78797B;
+}
+*{box-sizing:border-box;border-radius:0}
+html,body{margin:0}
+body{background:var(--surface);color:var(--charcoal);font:15px/1.45 var(--body);-webkit-font-smoothing:antialiased}
+.wrap{max-width:1160px;margin:0 auto;padding:28px 24px 48px}
+header.top{display:flex;flex-wrap:wrap;gap:14px 32px;align-items:flex-end;justify-content:space-between;margin-bottom:10px}
+h1{font:700 34px/1 var(--display);letter-spacing:-.02em;color:var(--ink);margin:0 0 8px}
+h1 .r{color:var(--red)}
+.sub{color:var(--meta);margin:0;font-size:14px}
+.param{display:flex;align-items:center;gap:12px;font:700 11px/1.3 var(--display);letter-spacing:.15em;text-transform:uppercase;color:var(--meta);border-top:1px solid var(--hair);border-bottom:1px solid var(--hair);padding:8px 0}
+input.num{font:15px var(--body);font-variant-numeric:tabular-nums;width:92px;padding:6px 8px;border:1px solid var(--meta);background:#fff;color:var(--ink);text-align:right}
+input.num::placeholder{color:var(--meta)}
+input.num:focus,nav.tabs button:focus-visible,.btn:focus-visible,.x:focus-visible,summary:focus-visible,a:focus-visible{outline:2px solid var(--red);outline-offset:2px}
+
+nav.tabs{position:sticky;top:0;z-index:5;display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:0 -24px 20px;padding:12px 24px;background:var(--surface);border-bottom:1px solid var(--hair)}
+nav.tabs button{font:inherit;text-align:left;display:flex;align-items:center;gap:16px;padding:14px 18px;border:1px solid var(--hair);border-top:4px solid var(--meta);background:#fff;color:var(--charcoal);cursor:pointer;transition:background .12s cubic-bezier(.2,.7,.3,1),border-color .12s cubic-bezier(.2,.7,.3,1)}
+nav.tabs button:hover{border-top-color:var(--red);background:var(--tint)}
+nav.tabs .n{flex:none;font:700 30px/1 var(--display);letter-spacing:-.02em;color:var(--red)}
+nav.tabs .tt{display:block;font:700 19px/1.2 var(--display);letter-spacing:-.01em;color:var(--ink)}
+nav.tabs .td{display:block;font-size:14px;line-height:1.3;color:var(--charcoal)}
+nav.tabs button[aria-selected="true"]{background:var(--charcoal);border-color:var(--charcoal);border-top-color:var(--red)}
+nav.tabs button[aria-selected="true"] .n,nav.tabs button[aria-selected="true"] .tt,nav.tabs button[aria-selected="true"] .td{color:#fff}
+
+.tiles,.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-bottom:28px}
+.tile,.ind{border-top:4px solid var(--red);padding:14px 0 0}
+.tile .lab,.stat .lab,.calc label,.calc .out .l{font:700 11px/1.3 var(--display);letter-spacing:.15em;text-transform:uppercase;color:var(--red)}
+.tile .val{font:700 38px/1.05 var(--display);letter-spacing:-.02em;color:var(--ink);margin:8px 0 6px}
+.tile .val small{font:15px var(--body);color:var(--charcoal);letter-spacing:0}
+.tile .det{font-size:14px;color:var(--charcoal)}
+.card{border-top:1px solid var(--hair);padding:22px 0 8px;margin-bottom:20px}
+.card h2{font:700 22px/1.1 var(--display);letter-spacing:-.02em;color:var(--ink);margin:0 0 6px}
+.card .lead{color:var(--charcoal);font-size:15px;margin:0 0 16px;max-width:820px}
+
+.scroll{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-variant-numeric:tabular-nums}
+th,td{padding:10px 10px;text-align:right;white-space:nowrap;border-bottom:1px solid var(--hair);color:var(--ink)}
+th{font:700 10.5px/1.35 var(--display);letter-spacing:.12em;text-transform:uppercase;color:var(--meta);vertical-align:bottom;white-space:normal;border-bottom:1px solid var(--charcoal)}
+th:first-child,td:first-child{text-align:left;padding-left:0}
+td:first-child{font-family:var(--display);font-weight:700;font-size:14px}
+.unit{color:var(--meta);font-weight:400;letter-spacing:.04em}
+#t-cop tbody tr:last-child td{font-weight:700;border-top:1px solid var(--charcoal);border-bottom:none}
+#t-cop tbody tr:not(:last-child):hover td,#t-round tbody tr:not(.new):hover td{background:var(--tint)}
+.meter{display:flex;align-items:center;gap:10px;justify-content:flex-end}
+.meter .track{position:relative;width:130px;height:8px;background:var(--hair);flex:none}
+.meter .fill{position:absolute;left:0;top:0;bottom:0;background:var(--charcoal)}
+.meter .tick{position:absolute;top:-5px;bottom:-5px;width:2px;background:var(--red)}
+.meter .pct{min-width:52px;text-align:right}
+.tgt,.was{display:block;font:400 12.5px/1.3 var(--body);color:var(--meta);letter-spacing:0;text-transform:none}
+.delta{font-weight:700;color:var(--ink)}
+.delta.up{color:var(--red)}
+.note{font-size:14px;color:var(--charcoal);margin:12px 0 0;max-width:860px}
+.note b{color:var(--ink);font-weight:700}
+details{margin-top:12px;font-size:14px}
+summary{cursor:pointer;color:var(--charcoal);width:max-content;text-decoration:underline;text-underline-offset:3px}
+details table{margin-top:8px;width:auto;min-width:420px}
+
+#t-round th.qh{text-align:center;color:var(--ink);font-size:12px;border-bottom:none;padding-bottom:2px}
+#t-round tr.sub th{text-align:right;font:400 13px/1.3 var(--body);letter-spacing:0;text-transform:none;padding-top:0}
+#t-round th,#t-round td{padding-left:8px;padding-right:8px}
+#t-round th:first-child,#t-round td:first-child{padding-left:0}
+#t-round .g{border-left:1px solid var(--hair)}
+#t-round td:first-child{white-space:normal;min-width:110px}
+#t-round tr.new td{background:var(--tint);border-top:4px solid var(--red);border-bottom:none;padding:10px 6px}
+#t-round tr.new td:first-child{padding-left:10px}
+#t-round tr.new input.num{width:100%;min-width:58px}
+.tag{display:inline-block;font:700 9.5px/1.4 var(--display);letter-spacing:.15em;text-transform:uppercase;color:var(--red);margin-left:8px}
+.btn{font:700 13px var(--display);padding:9px 16px;border:1px solid var(--charcoal);background:#fff;color:var(--ink);cursor:pointer;transition:background .12s cubic-bezier(.2,.7,.3,1)}
+.btn:hover{background:var(--tint)}
+.btn.primary{background:var(--red);border-color:var(--red);color:#fff}
+.btn.primary:hover{filter:brightness(.88);background:var(--red)}
+.x{font:14px var(--body);border:none;background:none;color:var(--charcoal);cursor:pointer;padding:4px 6px;text-decoration:underline;text-underline-offset:3px}
+.x:hover{color:var(--red)}
+.rowact{display:flex;flex-wrap:wrap;gap:8px 16px;align-items:center;margin-top:14px;font-size:14px;color:var(--charcoal)}
+.msg{color:var(--red);font-weight:700}
+
+.ind h3{font:700 20px/1.1 var(--display);letter-spacing:-.01em;color:var(--ink);margin:0 0 2px}
+.ind .what{font-size:14px;color:var(--charcoal);margin:0 0 10px;min-height:2.6em}
+.ind .val{font:700 32px/1.1 var(--display);letter-spacing:-.02em;color:var(--ink)}
+.ind .val small{font:15px var(--body);color:var(--charcoal);letter-spacing:0}
+.ind .when{font-size:13.5px;color:var(--meta);margin:2px 0 8px}
+.ind table td{padding:6px 0;font-size:14.5px}
+.ind table td:first-child{font:400 14.5px var(--body);color:var(--charcoal)}
+.links{display:flex;flex-direction:column;gap:6px;margin-top:12px;font-size:14.5px}
+.links a{color:var(--ink);font-weight:700;text-decoration:underline;text-decoration-color:var(--red);text-decoration-thickness:2px;text-underline-offset:3px}
+.links a:hover{color:var(--red)}
+.calc{display:flex;flex-wrap:wrap;gap:14px 24px;align-items:flex-end}
+.calc label{display:flex;flex-direction:column;gap:6px}
+.calc input.num{width:120px}
+.calc .out{min-width:130px}
+.calc .out .v{font:700 24px/1.2 var(--display);letter-spacing:-.01em;color:var(--ink);margin-top:4px}
+
+.ctitle{font:700 11px/1.3 var(--display);letter-spacing:.15em;text-transform:uppercase;color:var(--red);margin:0 0 4px}
+.csub{font-size:14px;color:var(--charcoal);margin:0 0 6px}
+.legend{display:flex;flex-wrap:wrap;gap:4px 20px;font-size:14px;color:var(--charcoal);margin:0 0 4px}
+.legend i{display:inline-block;width:18px;height:2px;vertical-align:middle;margin-right:7px}
+.chart{position:relative;width:100%}
+.chart svg{display:block;width:100%;overflow:visible}
+.chart text{font:12px var(--body);fill:var(--meta);font-variant-numeric:tabular-nums}
+.chart text.end{fill:var(--ink);font:700 12px var(--display)}
+.chart text.ref{fill:var(--red);font:700 11px var(--display)}
+.tip{position:absolute;pointer-events:none;background:#fff;border:1px solid var(--charcoal);padding:8px 10px;font-size:13.5px;min-width:180px;display:none;z-index:2}
+.tip .d{color:var(--meta);margin-bottom:4px}
+.tip .r{display:flex;align-items:center;gap:10px;justify-content:space-between}
+.tip .r span{color:var(--charcoal)} .tip .r b{font-weight:700;color:var(--ink)}
+.tip .k{display:inline-block;width:12px;height:2px;margin-right:6px;vertical-align:middle}
+.two{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:32px;align-items:start}
+.corr td,.corr th{padding:9px 8px}
+.corr td:first-child{font:400 14.5px var(--body);white-space:normal}
+.corr td.hi{font-weight:700}
+#t-round td.empty{text-align:left;color:var(--charcoal);font:400 15px var(--body);padding:18px 0}
+#t-round tr.new td:first-child{min-width:150px}
+#t-round .nl{display:block;font:700 14px var(--display);color:var(--ink);margin-bottom:6px}
+input.date{font:14px var(--body);padding:5px 6px;border:1px solid var(--meta);background:#fff;color:var(--ink);width:100%;max-width:150px}
+input.date:focus{outline:2px solid var(--red);outline-offset:1px}
+#t-round tr.del td{background:rgba(200,16,46,.06)}
+#t-round td.conf{white-space:nowrap}
+.btn.danger{background:var(--red);border-color:var(--red);color:#fff;padding:6px 12px}
+.btn[disabled]{opacity:.6;cursor:default}
+#round-note{color:var(--meta)}
+#round-note .btn{margin-left:4px;padding:6px 12px;font-size:12.5px}
+.msg.ok{color:var(--ink);font-weight:400}
+.ratios{display:grid;grid-template-columns:minmax(220px,1.6fr) repeat(4,minmax(90px,1fr));gap:12px 16px;align-items:end;border-top:4px solid var(--charcoal);background:var(--tint);padding:14px 16px 16px;margin:0 0 18px}
+.ratios .rl{display:flex;flex-direction:column;gap:4px;align-self:center}
+.ratios .rt{font:700 15px/1.2 var(--display);color:var(--ink)}
+.ratios .rh{font-size:13.5px;color:var(--charcoal)}
+.ratios label{display:flex;flex-direction:column;gap:6px;font:700 11px/1.3 var(--display);letter-spacing:.15em;text-transform:uppercase;color:var(--red)}
+.ratios input.num{width:100%;font:700 18px var(--display)}
+.ratios .msg{grid-column:1/-1;font:400 13px var(--body);color:var(--charcoal);min-height:0}
+.ratios .msg:empty{display:none}
+footer{font-size:13px;color:var(--meta);margin-top:8px;border-top:1px solid var(--hair);padding-top:12px}
+footer p{margin:0 0 4px}
+footer a{color:inherit}
+@media (max-width:820px){
+  .tiles,.cards{grid-template-columns:1fr}
+  .two{grid-template-columns:1fr}
+  .ratios{grid-template-columns:repeat(2,1fr)}
+  .ratios .rl{grid-column:1/-1}
+  .tile .val{font-size:30px}
+  nav.tabs{gap:8px}
+  nav.tabs .td{display:none}
+  nav.tabs button{padding:10px 12px;gap:10px}
+  nav.tabs .n{font-size:22px}
+  nav.tabs .tt{font-size:15px}
+  h1{font-size:26px}
+}
+
+.login{max-width:420px;margin:80px auto;padding:0 24px}
+.login .card{border-top:4px solid var(--red)}
+.login label{display:block;font:700 11px/1.3 var(--display);letter-spacing:.15em;text-transform:uppercase;color:var(--red);margin:14px 0 6px}
+.login input{width:100%;font:16px var(--body);padding:9px 10px;border:1px solid var(--meta);color:var(--ink)}
+.login input:focus,.calc input.date:focus{outline:2px solid var(--red);outline-offset:2px}
+.login .btn{margin-top:18px;width:100%}
+.login .msg{display:block;margin-top:12px;color:var(--red)}
+header.top{display:flex;justify-content:space-between;align-items:flex-end;gap:16px}
+.who{font-size:14px;color:var(--meta);text-align:right}
+.who .x{margin-left:6px}
+#boot{padding:40px 0;color:var(--charcoal)}
+#t-round td.q{text-align:right;vertical-align:top}
+.qv{display:flex;flex-direction:column;align-items:flex-end;gap:2px;line-height:1.3}
+.qv b{font-weight:700;color:var(--ink)}
+.qv span{font-size:13.5px;color:var(--charcoal)}
+.qv .br{color:var(--ink)}
+.qv .br.none{color:var(--meta)}
+.qv .x.add{padding:2px 0;font-size:13px;color:var(--red)}
+.x.tiny{font-size:12px;padding:0 0 0 6px}
+.qv .be{display:flex;gap:4px;align-items:center;margin-top:2px}
+input.num.sm{width:72px;padding:4px 6px;font-size:14px}
+.btn.tiny{padding:4px 8px;font-size:12px}
+.qin{display:flex;flex-direction:column;gap:4px}
+#t-round tr.new .qin input.num{width:100%;min-width:74px}
+.tgt.warn{color:var(--red)}
+.how{font-size:13px;margin:4px 0 8px;color:var(--charcoal)}
+.how.manual{color:var(--red)}
+.gsave{display:flex;flex-wrap:wrap;align-items:flex-end;gap:14px;margin-top:14px}
+.gsave label{font:700 11px/1.3 var(--display);letter-spacing:.15em;text-transform:uppercase;color:var(--red);display:flex;flex-direction:column;gap:6px}
+table.mini{margin-top:12px;max-width:640px}
+table.mini td.src{color:var(--meta);font-size:13px;text-align:left}
+.upd{display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin:8px 0 0}
+
+</style>
+</head>
+<body>
+<div class="login" id="login" hidden>
+  <section class="card">
+    <h2>Hedging fuel 2027, FTL</h2>
+    <p class="lead">Accesso riservato al team. Il nome serve solo a registrare chi inserisce i round.</p>
+    <form id="login-form" autocomplete="on">
+      <label for="l-name">Il tuo nome</label><input id="l-name" name="username" autocomplete="username" maxlength="40">
+      <label for="l-pw">Password</label><input id="l-pw" name="password" type="password" autocomplete="current-password">
+      <button class="btn primary" id="l-go" type="submit">Entra</button>
+      <span class="msg" id="l-msg" role="status" aria-live="polite"></span>
+    </form>
+  </section>
+</div>
+<div class="wrap"><p id="boot">Caricamento…</p></div>
+
+<div class="wrap" id="app" hidden>
+
+<header class="top">
+  <div>
+    <h1>Hedging fuel 2027, <span class="r">FTL</span></h1>
+    <p class="sub" id="asof"></p>
+  </div>
+  <div class="who"><span id="who"></span><button class="x" type="button" id="logout">Esci</button></div>
+</header>
+
+<nav class="tabs" role="tablist">
+  <button role="tab" id="tab-cop" aria-controls="pg-cop" aria-selected="true"><span class="n">01</span><span><span class="tt">Coperture e round</span><span class="td">Fissato, confronto con il budget, simulazione dei round</span></span></button>
+  <button role="tab" id="tab-ind" aria-controls="pg-ind" aria-selected="false"><span class="n">02</span><span><span class="tt">Indicatori</span><span class="td">Indice fornitori EU-27, future gasoil, Brent e link alle fonti</span></span></button>
+</nav>
+
+<div id="pg-cop" role="tabpanel" aria-labelledby="tab-cop">
+<div class="tiles" id="tiles"></div>
+
+<section class="card" id="coperture">
+  <h2>Coperture 2027 rispetto al budget</h2>
+  <p class="lead">Quanto è fissato per trimestre, a che prezzo medio e come si confronta con l'ipotesi Brent di budget. Il Brent medio è la media ponderata sulle tonnellate del Brent registrato a ogni fissazione; il rapporto sotto il valore è prezzo medio ÷ Brent medio.</p>
+  <section class="ratios" id="ratios" aria-label="Rapporto future diviso Brent per trimestre">
+    <div class="rl"><span class="rt">Rapporto di riserva future ÷ Brent</span><span class="rh">Si usa solo per le fissazioni senza Brent registrato. Uno per trimestre, modificabile, vale per tutti.</span></div>
+    <label><span>Q1 2027</span><input class="num" data-r="0" inputmode="decimal" autocomplete="off" aria-label="Rapporto Q1 2027"></label>
+    <label><span>Q2 2027</span><input class="num" data-r="1" inputmode="decimal" autocomplete="off" aria-label="Rapporto Q2 2027"></label>
+    <label><span>Q3 2027</span><input class="num" data-r="2" inputmode="decimal" autocomplete="off" aria-label="Rapporto Q3 2027"></label>
+    <label><span>Q4 2027</span><input class="num" data-r="3" inputmode="decimal" autocomplete="off" aria-label="Rapporto Q4 2027"></label>
+    <span class="msg" id="ratio-msg" role="status" aria-live="polite"></span>
+  </section>
+  <div class="scroll"><table id="t-cop"></table></div>
+  <p class="note" id="cop-note"></p>
+</section>
+
+<section class="card" id="round">
+  <h2>Round</h2>
+  <p class="lead">Per aggiungere una fissazione, scrivi nell'ultima riga data, tonnellate, prezzo quotato dalla banca (€/t) e Brent dello stesso trimestre ($/barile) e premi Salva round. Il Brent da scrivere è lo swap o forward Brent sul trimestre fissato, da chiedere alla banca insieme alla quotazione (in alternativa la media dei future Brent ICE che scadono in quel trimestre). Il round è salvato online e lo vedono subito tutti; si toglie solo con Elimina.</p>
+  <div class="scroll"><table id="t-round"></table></div>
+  <div class="rowact"><span class="msg" id="round-msg" role="status" aria-live="polite"></span><span id="round-note"></span></div>
+</section>
+</div>
+
+<div id="pg-ind" role="tabpanel" aria-labelledby="tab-ind" hidden>
+<div class="cards" id="cards"></div>
+
+<section class="card" id="oggi">
+  <h2>Aggiornamento settimanale del future</h2>
+  <p class="lead">Indice fornitori, Brent e cambio si aggiornano da soli. Il future gasoil no: una volta a settimana leggi il prezzo in $/t dal link nella scheda «Future gasoil», scrivilo qui e premi Salva. Il valore entra nei grafici e lo vedono tutti.</p>
+  <div class="calc">
+    <label>Future gasoil, $/t<input class="num" id="c-fut" inputmode="decimal" autocomplete="off"></label>
+    <label>Cambio EUR/USD<input class="num" id="c-fx" inputmode="decimal" autocomplete="off"></label>
+    <label>Brent, $/barile<input class="num" id="c-brent" inputmode="decimal" autocomplete="off"></label>
+    <div class="out"><div class="l">Future in €/t</div><div class="v" id="c-eur">—</div></div>
+    <div class="out"><div class="l">Rapporto future ÷ Brent</div><div class="v" id="c-rap">—</div></div>
+  </div>
+  <div class="gsave"><label>Data del valore<input type="date" class="date" id="c-date"></label><button class="btn primary" type="button" id="c-save" disabled>Salva come future del giorno</button><span class="msg" id="c-msg" role="status" aria-live="polite"></span></div>
+  <p class="note" id="c-note"></p>
+  <div id="g-list"></div>
+</section>
+
+<section class="card" id="pompa">
+  <h2>Indice fornitori e future a confronto</h2>
+  <p class="lead">Di quanti euro è cambiato ciascun prezzo dal 5 gennaio 2026, nella stessa unità (€/1000 L; il future è convertito da €/t dividendo per 1,19).</p>
+  <div class="two">
+    <div>
+      <div class="legend"><span><i style="background:var(--s1)"></i>Indice fornitori EU-27 con tasse</span><span><i style="background:var(--s2)"></i>Future gasoil</span></div>
+      <div class="chart" id="ch-pompa"></div>
+      <details><summary>Dati in tabella</summary><div class="scroll"><table id="t-pompa"></table></div></details>
+    </div>
+    <div>
+      <p class="ctitle">Quanto si seguono</p>
+      <p class="csub">Correlazione tra le variazioni %: 1 = si muovono insieme, 0 = nessun legame.</p>
+      <div class="scroll"><table class="corr" id="t-corr"></table></div>
+      <p class="note" id="corr-note"></p>
+    </div>
+  </div>
+</section>
+
+<section class="card" id="rapporto">
+  <h2>Rapporto future ÷ Brent</h2>
+  <p class="lead">Future gasoil in €/t diviso Brent in $/barile: fino a ottobre 2026 dati Bloomberg giornalieri, poi i valori settimanali inseriti qui sopra divisi per il Brent EIA dello stesso giorno.</p>
+  <div class="chart" id="ch-rap"></div>
+  <p class="note" id="rap-note"></p>
+</section>
+</div>
+
+<footer>
+  <p><b>Fonti.</b> Round, rapporti e parametri: salvati online e condivisi tra tutti gli utenti (budget e fabbisogno da <i>ANALISI HEDGING bdg 2027 V2.xlsx</i>). Indice fornitori: <a href="https://energy.ec.europa.eu/data-and-analysis/weekly-oil-bulletin_en" target="_blank" rel="noopener">EU Weekly Oil Bulletin</a>, media ponderata EU-27 del diesel con tasse. Brent: EIA Europe Brent spot via <a href="https://fred.stlouisfed.org/series/DCOILBRENTEU" target="_blank" rel="noopener">FRED</a>. Cambio: BCE via Frankfurter. Future gasoil: export Bloomberg QSX6 fino al 12/10/2026, poi inserimento manuale.</p>
+  <p id="m-status"></p>
+  <div class="upd"><button class="btn" type="button" id="m-update">Aggiorna ora</button></div>
+</footer>
+</div>
+
+
+
+<script>
+/* ---------- formati ---------- */
+const MESI=['gen','feb','mar','apr','mag','giu','lug','ago','set','ott','nov','dic'];
+function num(v,dec){
+  if(v==null||!isFinite(v)) return '—';
+  const neg=v<0; v=Math.abs(v);
+  let s=v.toFixed(dec||0), p=s.split('.');
+  p[0]=p[0].replace(/\B(?=(\d{3})+(?!\d))/g,'.');
+  return (neg?'−':'')+p[0]+(p[1]?','+p[1]:'');
+}
+function sgn(v,dec){ if(v==null||!isFinite(v)) return '—'; return (v>0?'+':'')+num(v,dec); }
+function dshort(iso){ const p=iso.split('-'); return (+p[2])+' '+MESI[+p[1]-1]; }
+function dlong(iso){ return dshort(iso)+' '+iso.slice(0,4); }
+function parse(s){ if(s==null) return null; s=String(s).trim().replace(/\s/g,''); if(s==='') return null;
+  if(s.indexOf(',')>=0) s=s.replace(/\./g,'').replace(',','.');
+  else if(/^-?\d{1,3}(\.\d{3})+$/.test(s)) s=s.replace(/\./g,'');
+  const v=parseFloat(s); return /^-?\d*\.?\d+$/.test(s)&&isFinite(v)?v:null; }
+function el(tag,attrs,kids){
+  const e=document.createElement(tag);
+  if(attrs) for(const k in attrs){ if(k==='class') e.className=attrs[k]; else if(k==='text') e.textContent=attrs[k]; else e.setAttribute(k,attrs[k]); }
+  (kids||[]).forEach(c=>e.appendChild(typeof c==='string'?document.createTextNode(c):c));
+  return e;
+}
+function clear(e){ while(e.firstChild) e.removeChild(e.firstChild); return e; }
+const $=id=>document.getElementById(id);
+
+
+/* ---------- grafici ---------- */
+function niceTicks(lo,hi,n){
+  const span=hi-lo, raw=span/n, mag=Math.pow(10,Math.floor(Math.log10(raw))), f=raw/mag;
+  const step=(f<1.5?1:f<3?2:f<7?5:10)*mag, out=[];
+  for(let v=Math.ceil(lo/step)*step; v<=hi+1e-9; v+=step) out.push(+v.toFixed(6));
+  return out;
+}
+const NS='http://www.w3.org/2000/svg';
+function sv(tag,attrs,text){ const e=document.createElementNS(NS,tag); for(const k in attrs) e.setAttribute(k,attrs[k]); if(text!=null) e.textContent=text; return e; }
+function lineChart(host,cfg){
+  function draw(){
+    clear(host);
+    const W=Math.max(300,host.clientWidth), H=cfg.height||280, m={l:46,r:cfg.right||24,t:18,b:26};
+    const xs=cfg.x, x0=xs[0], x1=xs[xs.length-1];
+    let lo=Infinity,hi=-Infinity;
+    cfg.series.forEach(s=>s.y.forEach(v=>{ if(v!=null){ lo=Math.min(lo,v); hi=Math.max(hi,v); } }));
+    if(cfg.ref!=null){ lo=Math.min(lo,cfg.ref.v); hi=Math.max(hi,cfg.ref.v); }
+    if(cfg.zero) lo=Math.min(lo,0);
+    const ticks=niceTicks(lo,hi,5); lo=Math.min(lo,ticks[0]); hi=Math.max(hi,ticks[ticks.length-1]);
+    const pad=(hi-lo)*0.06; lo-=cfg.zero&&lo===0?0:pad; hi+=pad;
+    const X=v=>m.l+(v-x0)/(x1-x0)*(W-m.l-m.r), Y=v=>m.t+(hi-v)/(hi-lo)*(H-m.t-m.b);
+    const svg=sv('svg',{viewBox:'0 0 '+W+' '+H,height:H,role:'img','aria-label':cfg.label});
+    ticks.forEach(v=>{
+      svg.appendChild(sv('line',{x1:m.l,x2:W-m.r,y1:Y(v),y2:Y(v),stroke:(cfg.zero&&v===0)?'var(--axis)':'var(--grid)','stroke-width':1}));
+      svg.appendChild(sv('text',{x:m.l-8,y:Y(v)+4,'text-anchor':'end'},cfg.tick(v)));
+    });
+    const d0=new Date(x0), mo=new Date(Date.UTC(d0.getUTCFullYear(),d0.getUTCMonth(),1));
+    let last=-99;
+    for(let k=0;k<14;k++){
+      const t=Date.UTC(mo.getUTCFullYear(),mo.getUTCMonth()+k,1);
+      if(t<x0||t>x1) continue;
+      const px=X(t); if(px-last<34) continue; last=px;
+      svg.appendChild(sv('line',{x1:px,x2:px,y1:H-m.b,y2:H-m.b+4,stroke:'var(--axis)'}));
+      svg.appendChild(sv('text',{x:px,y:H-6,'text-anchor':'middle'},MESI[new Date(t).getUTCMonth()]));
+    }
+    if(cfg.ref!=null){
+      svg.appendChild(sv('line',{x1:m.l,x2:W-m.r,y1:Y(cfg.ref.v),y2:Y(cfg.ref.v),stroke:'var(--red)','stroke-width':1}));
+      svg.appendChild(sv('text',{x:m.l+6,y:Y(cfg.ref.v)-6,class:'ref'},cfg.ref.label));
+    }
+    cfg.series.forEach(s=>{
+      let d='',pen=false,li=-1;
+      s.y.forEach((v,i)=>{ if(v==null){ pen=false; return; } d+=(pen?'L':'M')+X(xs[i]).toFixed(1)+' '+Y(v).toFixed(1); pen=true; li=i; });
+      svg.appendChild(sv('path',{d:d,fill:'none',stroke:s.color,'stroke-width':2,'stroke-linejoin':'round','stroke-linecap':'round'}));
+      if(li>=0){
+        const cx=X(xs[li]), cy=Y(s.y[li]);
+        svg.appendChild(sv('circle',{cx:cx,cy:cy,r:4,fill:s.color,stroke:'#fff','stroke-width':2}));
+        if(s.end){
+          const right=(W-m.r-cx)>60||m.r>=60;
+          let a;
+          if(s.endPos==='leader'){
+            const lx=W-m.r+6;
+            svg.insertBefore(sv('line',{x1:cx+6,x2:lx,y1:cy,y2:cy,stroke:'var(--axis)','stroke-width':1}),svg.lastChild);
+            a={x:lx+3,y:cy+4,'text-anchor':'start'};
+          } else a=right?{x:cx+9,y:cy+4,'text-anchor':'start'}:{x:cx-8,y:cy-10,'text-anchor':'end'};
+          a.class='end'; svg.appendChild(sv('text',a,s.end(s.y[li])));
+        }
+      }
+    });
+    const cross=sv('line',{y1:m.t,y2:H-m.b,stroke:'var(--axis)','stroke-width':1,visibility:'hidden'});
+    svg.appendChild(cross);
+    const dots=cfg.series.map(s=>{ const c=sv('circle',{r:4,fill:s.color,stroke:'#fff','stroke-width':2,visibility:'hidden'}); svg.appendChild(c); return c; });
+    const hit=sv('rect',{x:m.l,y:m.t,width:W-m.l-m.r,height:H-m.t-m.b,fill:'transparent',tabindex:0,'aria-label':cfg.label+'. Usa le frecce per leggere i valori.'});
+    svg.appendChild(hit); host.appendChild(svg);
+    const tip=el('div',{class:'tip'}); host.appendChild(tip);
+    let cur=xs.length-1;
+    function show(i){
+      cur=i; const px=X(xs[i]);
+      cross.setAttribute('x1',px); cross.setAttribute('x2',px); cross.setAttribute('visibility','visible');
+      cfg.series.forEach((s,k)=>{ const v=s.y[i]; if(v==null){ dots[k].setAttribute('visibility','hidden'); } else { dots[k].setAttribute('cx',px); dots[k].setAttribute('cy',Y(v)); dots[k].setAttribute('visibility','visible'); } });
+      clear(tip); tip.appendChild(el('div',{class:'d',text:cfg.date(i)}));
+      cfg.tip(i).forEach(r=>{
+        const lab=el('span'); if(r.color){ lab.appendChild(el('i',{class:'k',style:'background:'+r.color})); } lab.appendChild(document.createTextNode(r.name));
+        tip.appendChild(el('div',{class:'r'},[lab,el('b',{text:r.value})]));
+      });
+      tip.style.display='block';
+      const tw=tip.offsetWidth; let left=px+12; if(left+tw>W) left=px-12-tw; if(left<0) left=0;
+      tip.style.left=left+'px'; tip.style.top=(m.t+4)+'px';
+    }
+    function hide(){ cross.setAttribute('visibility','hidden'); dots.forEach(c=>c.setAttribute('visibility','hidden')); tip.style.display='none'; }
+    hit.addEventListener('pointermove',e=>{
+      const r=svg.getBoundingClientRect(), xv=x0+((e.clientX-r.left)*(W/r.width)-m.l)/(W-m.l-m.r)*(x1-x0);
+      let b=0,bd=Infinity; for(let i=0;i<xs.length;i++){ const dd=Math.abs(xs[i]-xv); if(dd<bd){ bd=dd; b=i; } } show(b);
+    });
+    hit.addEventListener('pointerleave',hide);
+    hit.addEventListener('focus',()=>show(cur)); hit.addEventListener('blur',hide);
+    hit.addEventListener('keydown',e=>{ if(e.key==='ArrowLeft'){ show(Math.max(0,cur-1)); e.preventDefault(); } if(e.key==='ArrowRight'){ show(Math.min(xs.length-1,cur+1)); e.preventDefault(); } });
+  }
+  draw();
+  let w=host.clientWidth, to=null;
+  window.addEventListener('resize',()=>{ clearTimeout(to); to=setTimeout(()=>{ if(host.clientWidth!==w){ w=host.clientWidth; draw(); } },120); });
+}
+const ms=iso=>Date.parse(iso+'T00:00:00Z');
+
+
+/* ---------- stato ---------- */
+const Q=['Q1 2027','Q2 2027','Q3 2027','Q4 2027'];
+const S={ state:null, etag:null, market:null, me:'', canWrite:true, busy:false, confirm:null, brentEdit:null,
+  draft:{t:[null,null,null,null],p:[null,null,null,null],b:[null,null,null,null],data:null} };
+const P=()=>S.state.params;
+
+function today(){ const n=new Date(); return n.getFullYear()+'-'+String(n.getMonth()+1).padStart(2,'0')+'-'+String(n.getDate()).padStart(2,'0'); }
+const tons=v=>num(v,Math.abs(v-Math.round(v))<1e-9?0:1);
+const price=v=>num(v,Math.abs(v-Math.round(v))<1e-9?0:1);
+function fmtR(v){ return num(v,Math.abs(v*10-Math.round(v*10))<1e-9?1:2); }
+function rounds(){ return (S.state.rounds||[]).slice().sort((x,y)=>(x.data||'').localeCompare(y.data||'')||(x.creato||'').localeCompare(y.creato||'')); }
+function bOf(r,i){ return Array.isArray(r.b)&&r.b[i]>0?r.b[i]:null; }
+
+/* Per trimestre: tonnellate, prezzo medio €/t e Brent medio ponderato.
+   Il Brent di ogni fissazione è quello registrato con la quotazione; dove manca si usa prezzo ÷ rapporto di riserva. */
+function coperture(){
+  const R=S.state.ratios;
+  return Q.map((q,i)=>{
+    let t=0,eur=0,usdSum=0,tNoB=0;
+    rounds().forEach(r=>{ const tt=r.t[i], pp=r.p[i]; if(tt>0&&pp>0){ t+=tt; eur+=tt*pp; const b=bOf(r,i); if(b) usdSum+=tt*b; else { usdSum+=tt*pp/R[i]; tNoB+=tt; } } });
+    const need=P().fabbisogno[i], avg=t?eur/t:null, usd=t?usdSum/t:null;
+    return {q,need,t,eur,avg,usd,usdSum,tNoB,ratio:R[i],implied:(avg&&usd)?avg/usd:null,cov:t/need,target:P().target[i],todo:Math.max(0,need*P().target[i]-t),budget:P().budget[i]};
+  });
+}
+function totals(rows){
+  const T=rows.reduce((a,r)=>a+r.t,0), E=rows.reduce((a,r)=>a+r.eur,0), N=rows.reduce((a,r)=>a+r.need,0);
+  return {T,E,N,todo:rows.reduce((a,r)=>a+r.todo,0),avg:T?E/T:null,usd:T?rows.reduce((a,r)=>a+r.usdSum,0)/T:null,
+    tNoB:rows.reduce((a,r)=>a+r.tNoB,0),bw:T?rows.reduce((a,r)=>a+r.budget*r.t,0)/T:null};
+}
+function roundUsd(r){ let T=0,U=0,noB=false; for(let i=0;i<4;i++){ const tt=r.t[i],pp=r.p[i]; if(tt>0&&pp>0){ T+=tt; const b=bOf(r,i); if(b) U+=tt*b; else { U+=tt*pp/S.state.ratios[i]; noB=true; } } } return {usd:T?U/T:null,noB}; }
+
+/* ---------- rete ---------- */
+async function api(method,path,payload){
+  const opt={method,headers:{'X-Hedging':'1'},credentials:'same-origin'};
+  if(payload!==undefined){ opt.headers['Content-Type']='application/json'; opt.body=JSON.stringify(payload); }
+  else if(method!=='GET'){ opt.headers['Content-Type']='application/json'; }
+  let r; try{ r=await fetch(path,opt); }catch(e){ return {status:0,error:'Connessione non riuscita: controlla la rete e riprova.'}; }
+  let j={}; try{ j=await r.json(); }catch(e){}
+  if(r.status===401){ showLogin(); }
+  return {status:r.status,...j,error:j.error||(r.ok?null:'Errore '+r.status+': riprova.')};
+}
+
+/* ---------- accesso ---------- */
+function showLogin(msgText){
+  $('app').hidden=true; $('login').hidden=false; $('l-msg').textContent=msgText||'';
+  try{ const n=localStorage.getItem('hedging.nome'); if(n&&!$('l-name').value) $('l-name').value=n; }catch(e){}
+  setTimeout(()=>$('l-pw').focus(),0);
+}
+async function doLogin(e){
+  e.preventDefault();
+  const name=$('l-name').value.trim(), pw=$('l-pw').value;
+  if(!pw){ $('l-msg').textContent='Scrivi la password.'; return; }
+  $('l-go').disabled=true; $('l-msg').textContent='';
+  const r=await api('POST','/api/login',{password:pw,name});
+  $('l-go').disabled=false;
+  if(r.status!==200){ $('l-msg').textContent=r.error; $('l-pw').select(); return; }
+  try{ localStorage.setItem('hedging.nome',name); }catch(e){}
+  $('l-pw').value=''; S.me=r.name||''; start();
+}
+async function logout(){ await api('DELETE','/api/login'); S.state=null; showLogin('Sei uscito.'); }
+
+/* ---------- caricamento e aggiornamento ---------- */
+async function start(){
+  const r=await api('GET','/api/state?market=1');
+  if(r.status===401) return;
+  if(r.status!==200){ $('boot').textContent=r.error; $('boot').hidden=false; return; }
+  S.state=r.state; S.etag=r.etag; S.market=r.market;
+  $('login').hidden=true; $('app').hidden=false; $('boot').hidden=true;
+  const w=await api('GET','/api/login'); S.me=(w&&w.name)||S.me;
+  $('who').textContent=S.me?'Collegato come '+S.me:'Collegato';
+  syncRatioInputs(true); refresh(); renderMarket();
+}
+async function poll(){
+  if(!S.state||document.hidden||S.busy) return;
+  const r=await api('GET','/api/state?v='+encodeURIComponent(S.etag||''));
+  if(r.status===200&&r.state){ S.state=r.state; S.etag=r.etag; syncRatioInputs(false); refresh(); }
+}
+function applyState(r){ if(r&&r.state){ S.state=r.state; S.etag=r.etag; } }
+function refresh(){ renderCoperture(); renderRounds(); if(window.__indDrawn) calc(); }
+
+/* ---------- rapporti di riserva ---------- */
+function syncRatioInputs(force){
+  document.querySelectorAll('#ratios input[data-r]').forEach(inp=>{ if(force||document.activeElement!==inp) inp.value=fmtR(S.state.ratios[+inp.dataset.r]); });
+}
+let ratioTimer=null;
+async function saveRatios(){
+  const m=$('ratio-msg'), v=S.state.ratios.slice();
+  const r=await api('PUT','/api/ratios',{ratios:v});
+  if(r.status===200){ applyState(r); m.textContent='Rapporti salvati: li vedono tutti.'; }
+  else m.textContent=r.error;
+}
+
+/* ---------- coperture ---------- */
+function deltaSpan(v,dec,unit){
+  if(v==null||!isFinite(v)) return document.createTextNode('—');
+  const word=v>0.05?' sopra':(v<-0.05?' sotto':' in linea');
+  return el('span',{class:'delta '+(v>0.05?'up':(v<-0.05?'down':'')),text:sgn(v,dec)+(unit||'')+word});
+}
+function th(h){ const p=h.split('|'); const e=el('th',{scope:'col'},[p[0]]); if(p[1]) e.appendChild(el('span',{class:'unit',text:' '+p[1]})); return e; }
+function renderCoperture(){
+  const rows=coperture(), a=totals(rows);
+  const tiles=clear($('tiles'));
+  tiles.appendChild(el('div',{class:'tile'},[
+    el('div',{class:'lab',text:'Coperto sul 2027'}),
+    el('div',{class:'val',text:num(a.T/a.N*100,1)+'%'}),
+    el('div',{class:'det',text:tons(a.T)+' t fissate su '+tons(a.N)+' t di fabbisogno'})]));
+  tiles.appendChild(el('div',{class:'tile'},[
+    el('div',{class:'lab',text:'Prezzo medio fissato'}),
+    el('div',{class:'val'},a.avg?[num(a.avg,1)+' €/t ',el('small',{text:'= '+num(a.usd,1)+' $/barile'})]:['—']),
+    el('div',{class:'det',text:a.avg?('Budget sugli stessi volumi: '+num(a.bw,1)+' $ ('+sgn(a.usd-a.bw,1)+' $)'):''})]));
+  tiles.appendChild(el('div',{class:'tile'},[
+    el('div',{class:'lab',text:'Da fissare per arrivare al target'}),
+    el('div',{class:'val',text:tons(a.todo)+' t'}),
+    el('div',{class:'det',text:'Target '+P().target.map(x=>Math.round(x*100)+'%').join(' / ')+' per trimestre'})]));
+
+  const t=clear($('t-cop'));
+  t.appendChild(el('thead',null,[el('tr',null,['Trimestre','Fabbisogno|t','Fissato|t','Copertura','Prezzo medio|€/t','Brent medio fissazioni|$/barile','Budget Brent|$/barile','Scostamento dal budget|$/barile','Da fissare|t'].map(th))]));
+  const tb=el('tbody');
+  rows.forEach(r=>{
+    const m=el('div',{class:'meter'},[
+      el('div',{class:'track'},[
+        el('div',{class:'fill',style:'width:'+Math.min(100,r.cov*100)+'%'}),
+        el('div',{class:'tick',style:'left:calc('+Math.min(100,r.target*100)+'% - 1px)',title:'Target '+Math.round(r.target*100)+'%'})]),
+      el('div',{class:'pct'},[num(r.cov*100,1)+'%',el('span',{class:'tgt',text:'target '+Math.round(r.target*100)+'%'})])]);
+    const usdCell=el('td');
+    if(r.avg){
+      usdCell.appendChild(document.createTextNode(num(r.usd,1)));
+      usdCell.appendChild(el('span',{class:'tgt',text:'rapporto '+fmtR(Math.round(r.implied*100)/100)}));
+      if(r.tNoB>0) usdCell.appendChild(el('span',{class:'tgt warn',text:tons(r.tNoB)+' t senza Brent: ÷ '+fmtR(r.ratio)}));
+    } else usdCell.textContent='—';
+    tb.appendChild(el('tr',null,[
+      el('td',{text:r.q}), el('td',{text:tons(r.need)}), el('td',{text:tons(r.t)}), el('td',null,[m]),
+      el('td',{text:r.avg?num(r.avg,1):'—'}), usdCell, el('td',{text:num(r.budget,0)}),
+      el('td',null,[r.avg?deltaSpan(r.usd-r.budget,1):'—']), el('td',{text:tons(r.todo)})]));
+  });
+  tb.appendChild(el('tr',null,[
+    el('td',{text:'Totale'}), el('td',{text:tons(a.N)}), el('td',{text:tons(a.T)}), el('td',{text:num(a.T/a.N*100,1)+'%'}),
+    el('td',{text:a.avg?num(a.avg,1):'—'}), el('td',{text:a.avg?num(a.usd,1):'—'}), el('td',{text:a.bw?num(a.bw,1):'—'}),
+    el('td',null,[a.avg?deltaSpan(a.usd-a.bw,1):'—']), el('td',{text:tons(a.todo)})]));
+  t.appendChild(tb);
+  const n=$('cop-note');
+  n.textContent=a.tNoB>0?('Per '+tons(a.tNoB)+' t non è stato registrato il Brent della fissazione: per quelle il Brent equivalente usa il rapporto di riserva qui sopra. Aggiungilo nella tabella dei round con "+ Brent".'):'Tutte le fissazioni hanno il Brent registrato: il Brent medio è la media ponderata sulle tonnellate.';
+  renderAsof();
+}
+
+/* ---------- round ---------- */
+function qCell(r,i,edit){
+  const tt=r.t[i],pp=r.p[i];
+  if(!(tt>0&&pp>0)) return el('td',{class:'g q',text:'—'});
+  const kids=[el('b',{text:tons(tt)+' t'}),el('span',{text:price(pp)+' €/t'})];
+  const b=bOf(r,i), key=r.id+':'+i;
+  if(S.brentEdit===key){
+    const inp=el('input',{class:'num sm',inputmode:'decimal',autocomplete:'off',placeholder:'$/bbl','aria-label':'Brent '+Q[i]+' '+r.nome,id:'be-in'});
+    if(b) inp.value=num(b,2);
+    kids.push(el('span',{class:'be'},[inp,el('button',{class:'btn tiny',type:'button','data-bsave':key,text:'OK'}),el('button',{class:'x',type:'button','data-bno':'1',text:'Annulla'})]));
+  } else if(b){
+    kids.push(el('span',{class:'br'},['Brent '+num(b,2)+' $', ...(edit?[el('button',{class:'x tiny',type:'button','data-bedit':key,'aria-label':'Correggi Brent '+Q[i]+' '+r.nome,text:'correggi'})]:[])]));
+  } else {
+    kids.push(edit?el('button',{class:'x add',type:'button','data-bedit':key,text:'+ Brent'}):el('span',{class:'br none',text:'Brent —'}));
+  }
+  return el('td',{class:'g q'},[el('div',{class:'qv'},kids)]);
+}
+function renderRounds(){
+  const t=clear($('t-round')), edit=S.canWrite;
+  t.appendChild(el('thead',null,[el('tr',null,[th('Round')].concat(Q.map(q=>{ const e=el('th',{scope:'col',class:'g qh'},[q]); e.appendChild(el('span',{class:'unit',text:' t · €/t · Brent'})); return e; }))
+    .concat(['Totale|t','Prezzo medio|€/t','Brent medio|$/barile'].map((h,k)=>{ const e=th(h); if(k===0) e.className='g'; return e; })).concat([el('th')]))]));
+  const tb=el('tbody'), list=rounds();
+  if(!list.length) tb.appendChild(el('tr',null,[el('td',{colspan:9,class:'empty',text:'Nessun round salvato.'})]));
+  list.forEach(r=>{
+    let T=0,E=0; r.t.forEach((v,i)=>{ if(v>0&&r.p[i]>0){ T+=v; E+=v*r.p[i]; } }); const U=roundUsd(r);
+    const name=el('td',null,[r.nome]);
+    name.appendChild(el('span',{class:'was',text:(r.data?dlong(r.data):'')+(r.da?' · '+r.da:'')}));
+    let act;
+    if(!edit) act=el('td');
+    else if(S.confirm===r.id) act=el('td',{class:'conf'},[
+      el('button',{class:'btn danger',type:'button','data-yes':r.id,text:'Sì, elimina'}),
+      el('button',{class:'x',type:'button','data-no':'1',text:'Annulla'})]);
+    else act=el('td',null,[el('button',{class:'x',type:'button','aria-label':'Elimina '+r.nome,'data-del':r.id,text:'Elimina'})]);
+    const qc=Q.map((q,i)=>qCell(r,i,edit));
+    tb.appendChild(el('tr',S.confirm===r.id?{class:'del'}:null,[name].concat(qc).concat([
+      el('td',{class:'g',text:tons(T)}), el('td',{text:T?num(E/T,1):'—'}),
+      el('td',null,[U.usd?num(U.usd,1):'—',...(U.noB?[el('span',{class:'tgt warn',text:'in parte stimato'})]:[])]), act])));
+  });
+  if(edit){
+    const d=S.draft, cells=[];
+    Q.forEach((q,i)=>{
+      const mk=(f,ph,lab)=>{ const x=el('input',{class:'num',inputmode:'decimal',autocomplete:'off',placeholder:ph,'aria-label':lab+' '+q,'data-f':f,'data-i':i}); if(d[f][i]!=null) x.value=f==='b'?num(d[f][i],2):price(d[f][i]); return x; };
+      cells.push(el('td',{class:'g q'},[el('div',{class:'qin'},[mk('t','t','Tonnellate'),mk('p','€/t','Prezzo'),mk('b','Brent $','Brent del trimestre')])]));
+    });
+    const dt=el('input',{type:'date',class:'date','aria-label':'Data del round',id:'d-date',max:'2100-12-31'}); dt.value=d.data||today();
+    const out=[el('td',{id:'d-t',class:'g'}),el('td',{id:'d-avg'}),el('td',{id:'d-usd'})];
+    const add=el('button',{class:'btn primary',type:'button',id:'add',text:S.busy?'Salvo…':'Salva round'}); if(S.busy) add.disabled=true;
+    tb.appendChild(el('tr',{class:'new'},[el('td',null,[el('span',{class:'nl',text:'Nuovo round'}),dt])].concat(cells).concat(out).concat([el('td',null,[add])])));
+  }
+  t.appendChild(tb);
+  if(edit) draftPreview();
+  if(S.brentEdit){ const i=$('be-in'); if(i) i.focus(); }
+}
+function renderAsof(){
+  const m=S.market, last=rounds().reduce((x,r)=>r.data>x?r.data:x,'');
+  const parts=[]; if(last) parts.push('Ultimo round: '+dlong(last));
+  if(m&&m.eu&&m.eu.length) parts.push('indice fornitori al '+dlong(m.eu[m.eu.length-1][0]));
+  if(m&&m.brent&&m.brent.length) parts.push('Brent al '+dlong(m.brent[m.brent.length-1][0]));
+  if(m&&m.gasoil&&m.gasoil.length) parts.push('future gasoil al '+dlong(m.gasoil[m.gasoil.length-1][0]));
+  $('asof').textContent=parts.join(' · ');
+}
+function draftPreview(){
+  const d=S.draft; let T=0,E=0,U=0,ok=true;
+  d.t.forEach((v,i)=>{ if(v>0&&d.p[i]>0){ T+=v; E+=v*d.p[i]; if(d.b[i]>0) U+=v*d.b[i]; else ok=false; } });
+  $('d-t').textContent=T?tons(T):'—'; $('d-avg').textContent=T?num(E/T,1):'—'; $('d-usd').textContent=T&&ok?num(U/T,1):'—';
+}
+function msg(s,ok){ const m=$('round-msg'); m.textContent=s||''; m.className='msg'+(ok?' ok':''); }
+function initRounds(){
+  const t=$('t-round');
+  t.addEventListener('input',e=>{ const a=e.target;
+    if(a.id==='d-date'){ S.draft.data=a.value||null; return; }
+    if(!a.dataset.f) return; S.draft[a.dataset.f][+a.dataset.i]=parse(a.value); draftPreview(); msg(''); });
+  t.addEventListener('keydown',e=>{ if(e.key==='Enter'&&e.target.dataset.f) addRound(); if(e.key==='Enter'&&e.target.id==='be-in'){ const b=t.querySelector('[data-bsave]'); if(b) b.click(); } if(e.key==='Escape'&&e.target.id==='be-in'){ S.brentEdit=null; renderRounds(); } });
+  t.addEventListener('click',e=>{
+    const a=e.target.closest('button'); if(!a) return;
+    if(a.id==='add') addRound();
+    if(a.dataset.del){ S.confirm=a.dataset.del; renderRounds(); const y=t.querySelector('[data-yes]'); if(y) y.focus(); }
+    if(a.dataset.no){ S.confirm=null; renderRounds(); }
+    if(a.dataset.yes) delRound(a.dataset.yes);
+    if(a.dataset.bedit){ S.brentEdit=a.dataset.bedit; renderRounds(); }
+    if(a.dataset.bno){ S.brentEdit=null; renderRounds(); }
+    if(a.dataset.bsave) saveBrent(a.dataset.bsave);
+  });
+}
+async function addRound(){
+  if(S.busy) return;
+  const d=S.draft, ok=d.t.map((v,i)=>v>0&&d.p[i]>0);
+  if(d.t.some((v,i)=>(v>0)!==(d.p[i]>0))){ msg('Per ogni trimestre servono sia le tonnellate sia il prezzo.'); return; }
+  if(d.b.some((v,i)=>v>0&&!ok[i])){ msg('Il Brent va indicato solo nei trimestri con tonnellate e prezzo.'); return; }
+  if(!ok.some(x=>x)){ msg('Scrivi tonnellate e prezzo per almeno un trimestre.'); return; }
+  const body={data:d.data||today(),t:d.t.map((v,i)=>ok[i]?v:null),p:d.p.map((v,i)=>ok[i]?v:null),b:d.b.map((v,i)=>ok[i]&&v>0?v:null)};
+  const missingB=ok.some((x,i)=>x&&!(d.b[i]>0));
+  S.busy=true; msg(''); renderRounds();
+  const r=await api('POST','/api/rounds',body);
+  S.busy=false;
+  if(r.status===200){ applyState(r); S.draft={t:[null,null,null,null],p:[null,null,null,null],b:[null,null,null,null],data:null}; refresh();
+    msg(r.nome+' salvato: lo vedono tutti.'+(missingB?' Senza Brent in qualche trimestre: puoi aggiungerlo con "+ Brent".':''),true); }
+  else { renderRounds(); msg(r.error); }
+}
+async function delRound(id){
+  if(S.busy) return; S.busy=true; S.confirm=null; renderRounds();
+  const r=await api('DELETE','/api/rounds?id='+encodeURIComponent(id));
+  S.busy=false;
+  if(r.status===200){ applyState(r); refresh(); msg(r.nome+' eliminato.',true); } else { renderRounds(); msg(r.error); }
+}
+async function saveBrent(key){
+  const [id,q]=key.split(':'), v=parse($('be-in').value);
+  if(!(v>0&&v<1000)){ msg('Scrivi il Brent in $/barile, per esempio 92,5.'); return; }
+  S.busy=true;
+  const r=await api('PATCH','/api/rounds?id='+encodeURIComponent(id),{q:+q,b:v});
+  S.busy=false;
+  if(r.status===200){ applyState(r); S.brentEdit=null; refresh(); msg('Brent salvato su '+r.nome+'.',true); } else msg(r.error);
+}
+
+/* ---------- indicatori ---------- */
+function at(arr,iso){ let v=null; for(let i=0;i<arr.length;i++){ if(arr[i][0]<=iso) v=arr[i]; else break; } return v; }
+function near(arr,iso,days){ const v=at(arr,iso); return v&&ms(iso)-ms(v[0])<=days*864e5?v:null; }
+function back(iso,days){ return new Date(ms(iso)-days*864e5).toISOString().slice(0,10); }
+function card(o){
+  const S0=o.series, L=S0[S0.length-1], rows=[];
+  [['1 settimana',7],['4 settimane',28],['13 settimane',91]].forEach(x=>{ const p=at(S0,back(L[0],x[1])); rows.push([x[0],p&&ms(L[0])-ms(p[0])>=(x[1]-4)*864e5&&ms(L[0])-ms(p[0])<=(x[1]+10)*864e5?sgn((L[1]/p[1]-1)*100,1)+'%':'—']); });
+  const y0=S0.find(r=>r[0]>='2026-01-01'); if(y0) rows.push(['Da inizio 2026',sgn((L[1]/y0[1]-1)*100,1)+'%']);
+  const win=S0.filter(r=>r[0]>=back(L[0],365));
+  let mn=win[0],mx=win[0]; win.forEach(r=>{ if(r[1]<mn[1]) mn=r; if(r[1]>mx[1]) mx=r; });
+  rows.push(['Minimo 12 mesi',num(mn[1],o.dec)+' ('+dshort(mn[0])+')']);
+  rows.push(['Massimo 12 mesi',num(mx[1],o.dec)+' ('+dshort(mx[0])+')']);
+  rows.push(['Dal massimo',sgn((L[1]/mx[1]-1)*100,1)+'%']);
+  const tb=el('tbody'); rows.forEach(r=>tb.appendChild(el('tr',null,[el('td',{text:r[0]}),el('td',{text:r[1]})])));
+  const links=el('div',{class:'links'}); o.links.forEach(l=>links.appendChild(el('a',{href:l[1],target:'_blank',rel:'noopener',text:l[0]+' →'})));
+  return el('div',{class:'ind'},[
+    el('h3',{text:o.title}), el('p',{class:'what',text:o.what}),
+    el('div',{class:'val'},[num(L[1],o.dec)+' ',el('small',{text:o.unit})]),
+    el('div',{class:'when',text:o.when(L)}), el('div',{class:'how '+(o.auto?'auto':'manual'),text:o.how}),
+    el('table',null,[tb]), links]);
+}
+function stTxt(s){ if(!s) return 'non ancora aggiornato'; return s.ok?('aggiornato in automatico il '+dlong(s.at.slice(0,10))):('ultimo aggiornamento non riuscito il '+dlong(s.at.slice(0,10))); }
+function renderMarket(){
+  const m=S.market; renderAsof();
+  const st=m.status||{};
+  $('m-status').textContent='Bollettino UE: '+stTxt(st.eu)+'. Brent: '+stTxt(st.brent)+'. Cambio BCE: '+stTxt(st.fx)+'. Il controllo automatico gira ogni giorno; il bollettino esce una volta a settimana.';
+  if(window.__indDrawn) drawIndicators();
+}
+function drawIndicators(){
+  const m=S.market, c=clear($('cards'));
+  const eu=m.eu.filter(r=>r[0]>=back(m.eu[m.eu.length-1][0],400));
+  c.appendChild(card({title:'Indice fornitori',what:'Diesel EU-27 con tasse, bollettino UE settimanale',unit:'€/1000 L',dec:2,auto:true,
+    series:eu, when:L=>'Prezzi di lunedì '+dlong(L[0]), how:'Si aggiorna da solo: '+stTxt(m.status&&m.status.eu),
+    links:[['Bollettino UE, pagina ufficiale','https://energy.ec.europa.eu/data-and-analysis/weekly-oil-bulletin_en']]}));
+  const g=m.gasoil, gl=g[g.length-1];
+  c.appendChild(card({title:'Future gasoil',what:'ICE Low Sulphur Gasoil, in euro',unit:'€/t',dec:2,auto:false,
+    series:g.map(x=>[x[0],x[1]]), when:L=>'Valore del '+dlong(L[0])+' · '+(gl[2]||''), how:'Va inserito a mano ogni settimana (qui sotto): non esiste una fonte gratuita ufficiale.',
+    links:[['ICE Low Sulphur Gasoil, prezzo attuale (TradingView)','https://www.tradingview.com/symbols/ICEEUR-ULS1!/'],['Prezzi per scadenza (TradingView)','https://www.tradingview.com/symbols/ICEEUR-ULS1!/contracts/'],['Contratto ICE ULSD 10ppm CIF Med, scheda','https://www.ice.com/products/6753556/ULSD-10ppm-CIF-Med-Cargoes-Future']]}));
+  if(m.brent&&m.brent.length){
+    c.appendChild(card({title:'Brent',what:'Greggio Brent Europe spot (EIA)',unit:'$/barile',dec:2,auto:true,
+      series:m.brent, when:L=>'Valore del '+dlong(L[0]), how:'Si aggiorna da solo: '+stTxt(m.status&&m.status.brent)+'. La fonte pubblica i dati con qualche giorno di ritardo.',
+      links:[['Brent, prezzo attuale (TradingView)','https://www.tradingview.com/symbols/ICEEUR-BRN1!/'],['Curva Brent per scadenza (TradingView)','https://www.tradingview.com/symbols/ICEEUR-BRN1!/contracts/'],['Serie ufficiale EIA (FRED)','https://fred.stlouisfed.org/series/DCOILBRENTEU']]}));
+  } else c.appendChild(el('div',{class:'ind'},[el('h3',{text:'Brent'}),el('p',{class:'what',text:'Dato non ancora scaricato: premi "Aggiorna ora" in fondo alla pagina.'})]));
+  renderGasoilList(); calc(); renderPompa(); renderRapporto();
+}
+function renderGasoilList(){
+  const box=clear($('g-list')), man=S.market.gasoil.filter(x=>!/Bloomberg/.test(x[2]||'')).slice(-6).reverse();
+  if(!man.length){ box.appendChild(el('p',{class:'note',text:'Nessun valore inserito a mano finora: l’ultimo dato è l’export Bloomberg del contratto novembre 2026.'})); return; }
+  const tb=el('tbody'); man.forEach(x=>tb.appendChild(el('tr',null,[el('td',{text:dlong(x[0])}),el('td',{text:num(x[1],2)+' €/t'}),el('td',{class:'src',text:x[2]||''}),el('td',null,[el('button',{class:'x',type:'button','data-gdel':x[0],text:'Elimina'})])])));
+  box.appendChild(el('table',{class:'mini'},[el('thead',null,[el('tr',null,['Data','Future','Inserito','' ].map(h=>el('th',{scope:'col',text:h})))]),tb]));
+}
+function calc(){
+  const f=parse($('c-fut').value), x=parse($('c-fx').value), b=parse($('c-brent').value);
+  const e=(f>0&&x>0)?f/x:null, r=(e&&b>0)?e/b:null;
+  $('c-eur').textContent=e?num(e,1):'—'; $('c-rap').textContent=r?num(r,2):'—';
+  $('c-save').disabled=!e; window.__calcEur=e;
+}
+function initCalc(){
+  const m=S.market;
+  if(m.fx&&!$('c-fx').value) $('c-fx').value=num(m.fx.usd,4);
+  if(m.brent&&m.brent.length&&!$('c-brent').value) $('c-brent').value=num(m.brent[m.brent.length-1][1],2);
+  $('c-date').value=today();
+  $('c-note').textContent=(m.fx?'Cambio BCE del '+dlong(m.fx.d)+' e ':'')+(m.brent&&m.brent.length?'Brent EIA del '+dlong(m.brent[m.brent.length-1][0])+' già inseriti: correggili se hai valori più recenti. ':'')+'Il future pubblico è il Gasoil ICE in dollari; la banca quota in euro il ULSD 10ppm CIF Med.';
+  ['c-fut','c-fx','c-brent'].forEach(id=>$(id).addEventListener('input',calc));
+  $('c-save').addEventListener('click',saveGasoil);
+  $('g-list').addEventListener('click',async e=>{ const a=e.target.closest('button'); if(!a||!a.dataset.gdel) return;
+    const r=await api('DELETE','/api/gasoil?d='+encodeURIComponent(a.dataset.gdel)); if(r.status===200){ S.market=r.market; drawIndicators(); renderAsof(); } else $('c-msg').textContent=r.error; });
+  calc();
+}
+async function saveGasoil(){
+  const e=window.__calcEur, d=$('c-date').value||today();
+  if(!e) return;
+  $('c-save').disabled=true;
+  const r=await api('POST','/api/gasoil',{d,eur:Math.round(e*100)/100});
+  if(r.status===200){ S.market=r.market; $('c-msg').textContent='Salvato: future del '+dlong(d)+' a '+num(e,1)+' €/t.'; $('c-fut').value=''; drawIndicators(); renderAsof(); }
+  else { $('c-msg').textContent=r.error; $('c-save').disabled=false; }
+}
+function renderPompa(){
+  const m=S.market, g=m.gasoil.map(x=>[x[0],x[1]]);
+  const C=m.eu.filter(r=>r[0]>='2026-01-05').map(r=>{ const f=near(g,r[0],6); return [r[0],r[1],f?f[1]:null]; });
+  if(!C.length) return;
+  const n=C.length, e0=C[0][1], f0=C[0][2];
+  const dE=C.map(r=>r[1]-e0), dF=C.map(r=>r[2]==null||f0==null?null:(r[2]-f0)/1.19);
+  lineChart($('ch-pompa'),{
+    x:C.map(r=>ms(r[0])), zero:true, right:92, height:300,
+    label:'Variazione da inizio 2026 di indice fornitori e future, in euro per 1000 litri',
+    tick:v=>sgn(v,0), date:i=>'Settimana del '+dlong(C[i][0]),
+    series:[
+      {color:'var(--s1)',y:dE,end:v=>'Indice '+sgn(v,0)},
+      {color:'var(--s2)',y:dF,end:v=>'Future '+sgn(v,0),endPos:'leader'}],
+    tip:i=>[
+      {name:'Indice fornitori',color:'var(--s1)',value:sgn(dE[i],0)+' ('+num(C[i][1],0)+' €/1000 L)'},
+      {name:'Future',color:'var(--s2)',value:dF[i]==null?'nessun dato':sgn(dF[i],0)+' ('+num(C[i][2],0)+' €/t)'}]
+  });
+  const t=clear($('t-pompa'));
+  t.appendChild(el('thead',null,[el('tr',null,['Settimana','Indice fornitori €/1000 L','Future €/t','Indice da inizio anno','Future da inizio anno (€/1000 L)'].map(h=>el('th',{scope:'col',text:h})))]));
+  const tb=el('tbody');
+  for(let i=n-1;i>=0;i--) tb.appendChild(el('tr',null,[el('td',{text:dlong(C[i][0])}),el('td',{text:num(C[i][1],2)}),el('td',{text:C[i][2]==null?'—':num(C[i][2],2)}),el('td',{text:sgn(dE[i],0)}),el('td',{text:dF[i]==null?'—':sgn(dF[i],0)})]));
+  t.appendChild(tb);
+  const cr=m.corr||{}, c=clear($('t-corr')), SS=[['2024, gennaio–settembre',cr.s24],['2026, gennaio–ottobre',cr.s26]].filter(x=>x[1]);
+  c.appendChild(el('thead',null,[el('tr',null,['Periodo','Stessa settimana','Con 1 settimana di ritardo','Medie mensili'].map(h=>el('th',{scope:'col',text:h})))]));
+  const cb=el('tbody');
+  SS.forEach(s=>cb.appendChild(el('tr',null,[el('td',null,[s[0],el('span',{class:'tgt',text:s[1].settimane+' settimane'})]),el('td',{text:num(s[1].stessa,2)}),el('td',{text:num(s[1].ritardo1,2)}),el('td',{class:'hi',text:num(s[1].mensile,2)})])));
+  c.appendChild(cb);
+  const cn=clear($('corr-note'));
+  cn.appendChild(document.createTextNode('Settimana per settimana il legame è debole, perché l’indice arriva circa una settimana dopo. Sulle medie mensili, più vicine all’orizzonte dello swap, i due prezzi si muovono insieme. '));
+  cn.appendChild(el('b',{text:'Limite dei dati: '}));
+  cn.appendChild(document.createTextNode('fino a ottobre 2026 il future è l’export Bloomberg del singolo contratto novembre 2026; dopo, i valori inseriti a mano ogni settimana.'));
+}
+function renderRapporto(){
+  const m=S.market, A=(m.ratioHist||[]).map(x=>[x[0],x[1],x[2],'Bloomberg']);
+  const lastH=A.length?A[A.length-1][0]:'';
+  m.gasoil.filter(x=>x[0]>lastH&&!/Bloomberg/.test(x[2]||'')).forEach(x=>{ const b=near(m.brent||[],x[0],6); if(b) A.push([x[0],x[1],b[1],'inserito + Brent EIA']); });
+  if(!A.length) return;
+  const r=A.map(x=>x[1]/x[2]), n=A.length, w=r.slice(Math.max(0,n-30)), mean=a=>a.reduce((s,v)=>s+v,0)/a.length;
+  $('rap-note').textContent='Ultimo dato ('+dlong(A[n-1][0])+'): '+num(r[n-1],2)+'. Media degli ultimi '+w.length+' valori: '+num(mean(w),2)+', tra '+num(Math.min.apply(null,w),1)+' e '+num(Math.max.apply(null,w),1)+'. Rapporti di riserva in uso: '+S.state.ratios.map(fmtR).join(' / ')+'.';
+  lineChart($('ch-rap'),{
+    x:A.map(x=>ms(x[0])), height:260, right:64,
+    label:'Rapporto tra future gasoil in euro per tonnellata e Brent in dollari per barile',
+    tick:v=>num(v,0), date:i=>dlong(A[i][0])+' · '+A[i][3],
+    series:[{color:'var(--charcoal)',y:r,end:v=>num(v,1)}],
+    tip:i=>[{name:'Rapporto',color:'var(--charcoal)',value:num(r[i],2)},{name:'Future',value:num(A[i][1],0)+' €/t'},{name:'Brent',value:num(A[i][2],1)+' $'}]
+  });
+}
+async function updateNow(){
+  const b=$('m-update'); b.disabled=true; b.textContent='Aggiorno…';
+  const r=await api('GET','/api/update-market');
+  b.disabled=false; b.textContent='Aggiorna ora';
+  if(r.status===200&&r.market){ S.market=r.market; renderMarket(); if(r.skipped) $('m-status').textContent+=' (Aggiornato meno di 20 minuti fa.)'; }
+  else if(r.error) $('m-status').textContent=r.error;
+}
+
+/* ---------- avvio ---------- */
+(function(){
+  $('login-form').addEventListener('submit',doLogin);
+  $('logout').addEventListener('click',logout);
+  $('m-update').addEventListener('click',updateNow);
+  const rbox=$('ratios');
+  rbox.addEventListener('input',e=>{ const a=e.target; if(!a.dataset.r) return; const v=parse(a.value); $('ratio-msg').textContent='';
+    if(v>0&&v<100){ S.state.ratios[+a.dataset.r]=v; refresh(); } });
+  rbox.addEventListener('change',e=>{ const a=e.target; if(!a.dataset.r) return; const v=parse(a.value);
+    if(!(v>0&&v<100)){ a.value=fmtR(S.state.ratios[+a.dataset.r]); $('ratio-msg').textContent='Scrivi un numero, per esempio 11,7.'; return; }
+    S.state.ratios[+a.dataset.r]=v; a.value=fmtR(v); refresh(); saveRatios(); });
+  initRounds();
+  function show(which,fromHash){
+    const ind=which==='ind';
+    $('pg-cop').hidden=ind; $('pg-ind').hidden=!ind;
+    $('tab-cop').setAttribute('aria-selected',String(!ind)); $('tab-ind').setAttribute('aria-selected',String(ind));
+    if(ind&&S.market&&!window.__indDrawn){ window.__indDrawn=true; initCalc(); drawIndicators(); }
+    if(!fromHash){ try{ history.replaceState(null,'',ind?'#indicatori':'#coperture'); }catch(e){} }
+    const hd=document.querySelector('header.top'), top=hd.offsetTop+hd.offsetHeight; if(window.scrollY>top) window.scrollTo(0,top);
+  }
+  window.__show=show;
+  $('tab-cop').addEventListener('click',()=>show('cop')); $('tab-ind').addEventListener('click',()=>show('ind'));
+  window.addEventListener('hashchange',()=>show(location.hash==='#indicatori'?'ind':'cop',true));
+  setInterval(poll,5*60*1000);
+  document.addEventListener('visibilitychange',()=>{ if(!document.hidden) poll(); });
+  start().then(()=>{ if(location.hash==='#indicatori'&&S.state) show('ind',true); });
+})();
+
+</script>
+</body>
+</html>
