@@ -1,5 +1,4 @@
 import crypto from 'node:crypto';
-import { session } from '../lib/auth.js';
 import { send } from '../lib/http.js';
 import { update, readJson, MARKET } from '../lib/store.js';
 import { SEED_MARKET } from '../lib/seed.js';
@@ -19,8 +18,7 @@ function merge(oldRows, newRows, from) {
 }
 
 export default async function handler(req, res) {
-  const cron = cronOk(req), user = session(req);
-  if (!cron && !user) return send(res, 401, { error: 'Accesso richiesto.' });
+  const cron = cronOk(req);
   if (!cron) {
     const cur = await readJson(MARKET);
     const at = cur.data && cur.data.status && cur.data.status.at;

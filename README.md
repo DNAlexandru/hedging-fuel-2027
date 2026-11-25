@@ -11,8 +11,7 @@ Dashboard condivisa per le coperture fuel FTL 2027 (round, Brent per fissazione,
 ## Messa online (una volta)
 1. Vercel → Add New → Project → importa questo repository. Framework: Other. Output directory: `public`.
 2. Nel progetto: Storage → Create → Blob → accesso **Private** → collega al progetto (crea `BLOB_READ_WRITE_TOKEN`).
-3. Settings → Environment Variables (Production):
-   - `APP_PASSWORD`: password condivisa del team
-   - `SESSION_SECRET`: stringa casuale lunga (almeno 32 caratteri)
-   - `CRON_SECRET`: stringa casuale lunga
-4. Redeploy. Poi apri `/api/update-market?key=<CRON_SECRET>` una volta per scaricare i primi dati di mercato.
+3. (Facoltativo) Settings → Environment Variables: `CRON_SECRET`, stringa casuale lunga, usata dal cron giornaliero.
+4. Redeploy.
+
+Accesso: libero per chi ha il link, senza password (scelta del team).

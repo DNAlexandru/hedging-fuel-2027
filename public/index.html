@@ -197,18 +197,6 @@ table.mini td.src{color:var(--meta);font-size:13px;text-align:left}
 </style>
 </head>
 <body>
-<div class="login" id="login" hidden>
-  <section class="card">
-    <h2>Hedging fuel 2027, FTL</h2>
-    <p class="lead">Accesso riservato al team. Il nome serve solo a registrare chi inserisce i round.</p>
-    <form id="login-form" autocomplete="on">
-      <label for="l-name">Il tuo nome</label><input id="l-name" name="username" autocomplete="username" maxlength="40">
-      <label for="l-pw">Password</label><input id="l-pw" name="password" type="password" autocomplete="current-password">
-      <button class="btn primary" id="l-go" type="submit">Entra</button>
-      <span class="msg" id="l-msg" role="status" aria-live="polite"></span>
-    </form>
-  </section>
-</div>
 <div class="wrap"><p id="boot">Caricamento…</p></div>
 
 <div class="wrap" id="app" hidden>
@@ -218,7 +206,6 @@ table.mini td.src{color:var(--meta);font-size:13px;text-align:left}
     <h1>Hedging fuel 2027, <span class="r">FTL</span></h1>
     <p class="sub" id="asof"></p>
   </div>
-  <div class="who"><span id="who"></span><button class="x" type="button" id="logout">Esci</button></div>
 </header>
 
 <nav class="tabs" role="tablist">
@@ -246,7 +233,7 @@ table.mini td.src{color:var(--meta);font-size:13px;text-align:left}
 
 <section class="card" id="round">
   <h2>Round</h2>
-  <p class="lead">Per aggiungere una fissazione, scrivi nell'ultima riga data, tonnellate, prezzo quotato dalla banca (€/t) e Brent dello stesso trimestre ($/barile) e premi Salva round. Il Brent da scrivere è lo swap o forward Brent sul trimestre fissato, da chiedere alla banca insieme alla quotazione (in alternativa la media dei future Brent ICE che scadono in quel trimestre). Il round è salvato online e lo vedono subito tutti; si toglie solo con Elimina.</p>
+  <p class="lead">Per aggiungere una fissazione, scrivi nell'ultima riga data, tonnellate, prezzo quotato dalla banca (€/t) e Brent dello stesso trimestre ($/barile) e premi Salva round. Il Brent da scrivere è lo swap o forward Brent sul trimestre fissato, da chiedere alla banca insieme alla quotazione (in alternativa la media dei future Brent ICE che scadono in quel trimestre). Il round è salvato online e lo vede chiunque apra il link; si toglie solo con Elimina.</p>
   <div class="scroll"><table id="t-round"></table></div>
   <div class="rowact"><span class="msg" id="round-msg" role="status" aria-live="polite"></span><span id="round-note"></span></div>
 </section>
@@ -464,38 +451,15 @@ async function api(method,path,payload){
   else if(method!=='GET'){ opt.headers['Content-Type']='application/json'; }
   let r; try{ r=await fetch(path,opt); }catch(e){ return {status:0,error:'Connessione non riuscita: controlla la rete e riprova.'}; }
   let j={}; try{ j=await r.json(); }catch(e){}
-  if(r.status===401){ showLogin(); }
   return {status:r.status,...j,error:j.error||(r.ok?null:'Errore '+r.status+': riprova.')};
 }
-
-/* ---------- accesso ---------- */
-function showLogin(msgText){
-  $('app').hidden=true; $('login').hidden=false; $('l-msg').textContent=msgText||'';
-  try{ const n=localStorage.getItem('hedging.nome'); if(n&&!$('l-name').value) $('l-name').value=n; }catch(e){}
-  setTimeout(()=>$('l-pw').focus(),0);
-}
-async function doLogin(e){
-  e.preventDefault();
-  const name=$('l-name').value.trim(), pw=$('l-pw').value;
-  if(!pw){ $('l-msg').textContent='Scrivi la password.'; return; }
-  $('l-go').disabled=true; $('l-msg').textContent='';
-  const r=await api('POST','/api/login',{password:pw,name});
-  $('l-go').disabled=false;
-  if(r.status!==200){ $('l-msg').textContent=r.error; $('l-pw').select(); return; }
-  try{ localStorage.setItem('hedging.nome',name); }catch(e){}
-  $('l-pw').value=''; S.me=r.name||''; start();
-}
-async function logout(){ await api('DELETE','/api/login'); S.state=null; showLogin('Sei uscito.'); }
 
 /* ---------- caricamento e aggiornamento ---------- */
 async function start(){
   const r=await api('GET','/api/state?market=1');
-  if(r.status===401) return;
   if(r.status!==200){ $('boot').textContent=r.error; $('boot').hidden=false; return; }
   S.state=r.state; S.etag=r.etag; S.market=r.market;
-  $('login').hidden=true; $('app').hidden=false; $('boot').hidden=true;
-  const w=await api('GET','/api/login'); S.me=(w&&w.name)||S.me;
-  $('who').textContent=S.me?'Collegato come '+S.me:'Collegato';
+  $('app').hidden=false; $('boot').hidden=true;
   syncRatioInputs(true); refresh(); renderMarket();
 }
 async function poll(){
@@ -819,8 +783,6 @@ async function updateNow(){
 
 /* ---------- avvio ---------- */
 (function(){
-  $('login-form').addEventListener('submit',doLogin);
-  $('logout').addEventListener('click',logout);
   $('m-update').addEventListener('click',updateNow);
   const rbox=$('ratios');
   rbox.addEventListener('input',e=>{ const a=e.target; if(!a.dataset.r) return; const v=parse(a.value); $('ratio-msg').textContent='';
