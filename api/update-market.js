@@ -18,6 +18,10 @@ function merge(oldRows, newRows, from) {
 }
 
 export default async function handler(req, res) {
+  try { return await run(req, res); }
+  catch (e) { console.error('update-market', e); return send(res, 500, { error: 'Aggiornamento non riuscito: ' + String(e && e.message || e).slice(0, 300) }); }
+}
+async function run(req, res) {
   const cron = cronOk(req);
   if (!cron) {
     const cur = await readJson(MARKET);
