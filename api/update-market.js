@@ -26,7 +26,9 @@ async function run(req, res) {
   if (!cron) {
     const cur = await readJson(MARKET);
     const at = cur.data && cur.data.status && cur.data.status.at;
-    if (at && Date.now() - Date.parse(at) < 20 * 60e3) return send(res, 200, { market: cur.data, skipped: true });
+    const st = (cur.data && cur.data.status) || {}, allOk = ['eu', 'brent', 'fx'].every(k => st[k] && st[k].ok);
+    /* Dopo un aggiornamento riuscito si aspetta 20 minuti; se una fonte non ha risposto si può riprovare dopo 2. */
+    if (at && Date.now() - Date.parse(at) < (allOk ? 20 : 2) * 60e3) return send(res, 200, { market: cur.data, skipped: true });
   }
   const [eu, brent, fx] = await Promise.allSettled([getEu(), getBrent(), getFx()]);
   const now = new Date().toISOString();
