@@ -840,7 +840,7 @@ async function updateNow(){
   window.__show=show;
   $('tab-cop').addEventListener('click',()=>show('cop')); $('tab-ind').addEventListener('click',()=>show('ind'));
   window.addEventListener('hashchange',()=>show(location.hash==='#indicatori'?'ind':'cop',true));
-  setInterval(poll,5*60*1000);
+  setInterval(poll,15*60*1000);
   document.addEventListener('visibilitychange',()=>{ if(!document.hidden) poll(); });
   start().then(()=>{ if(location.hash==='#indicatori'&&S.state) show('ind',true); });
 })();
